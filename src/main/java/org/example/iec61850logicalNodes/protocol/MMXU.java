@@ -8,7 +8,7 @@ import org.example.iec61850datatypes.measurements.WYE;
 import org.example.iec61850logicalNodes.common.LN;
 @Data
 public class MMXU extends LN {
-    private WYE A;
+    private WYE A = new WYE();
     private MV MinAPhs;
     private MV MaxAPhs;
 
@@ -21,14 +21,12 @@ public class MMXU extends LN {
         this.phsAInst = phsAInst;
         this.phsBInst = phsBInst;
         this.phsCInst = phsCInst;
-//        A = new WYE(phsAInst.getInstMag().getF().size());
-
     }
 
     //Создание экземпляров класса фильтра, для перобразования сигнала
-    private final Filter phsACurrent = new Fourier();
-    private final Filter phsBCurrent = new Fourier();
-    private final Filter phsCCurrent = new Fourier();
+    private final Filter phsACurrent = new Fourier(20);
+    private final Filter phsBCurrent = new Fourier(20);
+    private final Filter phsCCurrent = new Fourier(20);
     @Override
     public void process() {
         phsACurrent.process(phsAInst, A.getPhsA());

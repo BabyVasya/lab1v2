@@ -9,6 +9,7 @@ import org.example.iec61850logicalNodes.common.LN;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -26,8 +27,7 @@ public class LSVS extends LN {
     private List<String> csvFileList = new ArrayList<String>();
     private List<Double> aCoef = new ArrayList<>();
     private List<Double> bCoef = new ArrayList<>();
-    private int analogNumber;
-    private int discreteNumber;
+    private Iterator<String> iterator;
 
     //Инициализация листа аналоговых сигналов типа MV(Величина, тип величины, время)
     public LSVS() {
@@ -35,6 +35,7 @@ public class LSVS extends LN {
         setFilename("PhABC20");
         readFile();
         removeTrashInfo();
+        this.iterator = this.csvFileList.iterator();
         this.outA = new MV();
         this.outB = new MV();
         this.outC = new MV();
@@ -43,15 +44,13 @@ public class LSVS extends LN {
     @Override
     public void process() {
         //Сбор необходимых данных с cfg
-        setMvToOut(this.outA);
-        setMvToOut(this.outB);
-        setMvToOut(this.outC);
+        setMvToOut();
     }
 
 
     @SneakyThrows
     public void setFilename(String filename) {
-        //Чтение comtrade файлов
+        //Чтение csv файла
         this.csvFile = new File(path + filename + ".csv");
         //Excexption на неправильный путь
         if (!csvFile.exists()) throw new Exception("Путь указан неверно");
@@ -63,20 +62,26 @@ public class LSVS extends LN {
         this.csvFileList = Files.readAllLines(csvFile.toPath());
     }
 
-    public void setMvToOut(MV out){
-        int phIndex=0;
-        if (out == this.outA) phIndex = 1;
-        if (out == this.outB) phIndex = 2;
-        if (out == this.outC) phIndex = 3;
-        out.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0]));
-        out.getQ().setValue("KA");
-        for (int i =0; i < this.csvFileList.size()-1; i++) {
-            out.getInstMag().getF().setValue(Double.valueOf(this.csvFileList.get(i).split(",")[phIndex]));
+    public void setMvToOut(){
+        if(this.iterator.hasNext()) {
+            String e =iterator.next();
+            this.outA.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
+            this.outA.getQ().setValue("KA");
+            this.outA.getInstMag().getF().setValue(Double.valueOf(e.split(",")[1])*1000);
+            this.outB.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
+            this.outB.getQ().setValue("KA");
+            this.outB.getInstMag().getF().setValue(Double.valueOf(e.split(",")[2])*1000);
+            this.outC.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
+            this.outC.getQ().setValue("KA");
+            this.outC.getInstMag().getF().setValue(Double.valueOf(e.split(",")[3])*1000);
+            log.info(String.valueOf(outC));
         }
-        log.info(String.valueOf(out));
-
     }
     public void removeTrashInfo(){
         this.csvFileList.remove(0);
     }
-}
+
+    public boolean hasNext() {
+        return iterator.hasNext();
+    }
+    }

@@ -1,101 +1,133 @@
 package org.example.iec61850logicalNodes.protocol;
 
-import lombok.Data;
-import org.example.iec61850datatypes.common.Timestamp;
-import org.example.iec61850datatypes.measurements.ACT;
-import org.example.iec61850datatypes.measurements.AnalogueValue;
-import org.example.iec61850datatypes.measurements.CMV;
-import org.example.iec61850datatypes.measurements.MV;
+import org.example.iec61850datatypes.common.DataAttribute;
 import org.example.iec61850logicalNodes.common.LN;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
+import org.jfree.data.Range;
+import org.jfree.data.general.Series;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Data
+
 public class NHMI extends LN {
-    private MV instIphA;
-    private MV instIphB;
-    private MV instIphC;
-    private CMV phA;
-    private CMV phB;
-    private CMV phC;
-    private ACT op;
+
+    private final HashMap<XYSeries, DataAttribute<?>> datasets = new HashMap<>();
+    private final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new NumberAxis("Время"));;
+    private final JFrame frame = new JFrame();
+
+    private int notifyCount = 0, updatePoint = 10; // счетчик и период обновления графиков
+    private double currentTime = 0.0;
 
 
-    public NHMI(MV instIphA, MV instIphB, MV instIphC, CMV phA, CMV phB, CMV phC, ACT op) {
-        this.instIphA = instIphA;
-        this.instIphB = instIphB;
-        this.instIphC = instIphC;
-        this.phA = phA;
-        this.phB = phB;
-        this.phC = phC;
-        this.op = op;
+    public NHMI(){
+        JFreeChart chart = new JFreeChart("", plot);
+        chart.setBorderPaint(Color.black);
+        chart.setBorderVisible(true);
+        chart.setBackgroundPaint(Color.white);
+        chart.setAntiAlias(true);
+        ChartPanel chartPanel = new ChartPanel(chart);
+
+        frame.setTitle("МЭИ РЗиАЭ");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(chartPanel);
+        frame.setSize(1280,720);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
     }
 
-    @Override
-    public void process() {
-//        createGraphic(instIphA.getInstMag().getF(), instIphA.getT(), Color.BLACK);
-//        createGraphic(instIphB.getInstMag().getF(), instIphB.getT(), Color.BLUE);
-//        createGraphic(instIphC.getInstMag().getF(), instIphC.getT(), Color.RED);
-//        createGraphic(phA.getCVal().getMag().getF(), phA.getT(), Color.BLACK);
-//        createGraphic(phB.getCVal().getMag().getF(), phB.getT(), Color.BLUE);
-//        createGraphic(phC.getCVal().getMag().getF(), phC.getT(), Color.RED);
-//        createGraphic(boolToDouble(op.getGeneral()), op.getT(), Color.DARK_GRAY);
+
+    public void process(){
+        if(!frame.isVisible()) frame.setVisible(true);
+
+        currentTime += 1;
+        datasets.forEach((series, rawData) -> {
+            if(rawData.getValue() instanceof Number) series.add(currentTime, (Number) rawData.getValue(), false);
+            else if(rawData.getValue() instanceof Boolean) series.add(currentTime, (Boolean) rawData.getValue() ? 1 : 0, false);
+        });
+
+        /* Период обновления */
+        if(notifyCount++ > updatePoint) {
+            notifyCount = 0;
+            datasets.keySet().forEach(Series::fireSeriesChanged);
+        }
     }
 
-    //Создание коллекции для потроения графика
-//    public XYSeriesCollection addCollection(List<Double> f, Timestamp t) {
-//        XYSeries currentSeries = new XYSeries("Ток");
-//        double time =0;
-//        for (int i =0; i < f.size()-1; i++) {
-//            currentSeries.add(time,
-//                    f.get(i));
-//            time +=Double.parseDouble(t.getValue());
-//        }
-//        XYSeriesCollection collection = new XYSeriesCollection();
-//        collection.addSeries(currentSeries);
-//        return collection;
-//    }
-//
-//    public void createGraphic(List<Double> f,  Timestamp t, Color COLOR) {
-//
-//        JFreeChart chart = ChartFactory.createXYLineChart(
-//                "Осциллограмма тока от времени", // Заголовок графика
-//                "Время",
-//                "Ток",
-//                addCollection(f, t),
-//                PlotOrientation.VERTICAL,
-//                true,
-//                true,
-//                false
-//        );
-//        XYPlot plot = chart.getXYPlot();
-//        plot.getRenderer().setSeriesPaint(0, COLOR);
-//
-//        ChartPanel chartPanel = new ChartPanel(chart);
-//        chartPanel.setPreferredSize(new Dimension(800, 600));
-//        JFrame frame = new JFrame();
-//        frame.setContentPane(chartPanel);
-//        frame.pack();
-//        frame.setVisible(true);
-//    }
-//    public List<Double> boolToDouble(List<Boolean> opBool) {
-//        List<Double> opDouble = new ArrayList<>();
-//        for (int i =0; i < opBool.size()-1; i++) {
-//            if(!opBool.get(i)) opDouble.add(0.0);
-//            if(opBool.get(i)) opDouble.add(1.0);
-//        }
-//        return opDouble;
-//    }
+
+    /**
+     * Добавить группу сигналов
+     * @param name - название  группы сгналов
+     * @param signals - группа сигналов
+     */
+    public void addSignals(String name, NHMISignal... signals){
+        addSignals1(name, Arrays.asList(signals));
+    }
+
+    /**
+     * Добавить группу сигналов
+     * @param name - название  группы сгналов
+     * @param signals - группа сигналов
+     */
+    public void addSignals1(String name, List<NHMISignal> signals){
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        NumberAxis rangeAxis = new NumberAxis(name);
+        rangeAxis.setAutoRangeIncludesZero(false);
+        rangeAxis.setLabelAngle(45);
+
+        if(name.contains("Mag"))
+            rangeAxis.setRange(new Range(0.702, 0.711));
+
+//		rangeAxis.setLabelFont(new Font("Impact", Font.ITALIC, 10));
+        XYPlot subplot = new XYPlot(dataset, null, rangeAxis, new StandardXYItemRenderer());
+        subplot.setBackgroundPaint(Color.BLACK);
+        subplot.setDomainGridlinesVisible(false);
+        subplot.setDomainCrosshairVisible(true);
+        subplot.setRangeCrosshairVisible(true);
+        plot.add(subplot, 5);
+
+
+        /* Добавить дифференциал, если есть дискрет */
+        signals.stream().filter(s -> s.getDataY().getValue() instanceof Boolean || s.getDataY().getValue() instanceof Byte).findFirst().ifPresent(s -> {
+            subplot.setRenderer(0, new XYDifferenceRenderer());
+            subplot.setWeight(1);
+        });
+
+        for(NHMISignal s: signals){
+            XYSeries series = new XYSeries(s.getName());
+            dataset.addSeries(series);
+            datasets.put(series, s.getDataY());
+        }
+
+        process();
+    }
+
+
+
+    /**
+     * Добавить группу сигналов
+     * @param signals - группа сигналов
+     */
+    public void addSignals(NHMISignal... signals){
+        String name = Arrays.stream(signals)
+                .map(NHMISignal::getName)
+                .collect(Collectors.joining(", "));
+        addSignals(name, signals);
+    }
+
+    public void dispose() {
+        frame.dispose();
+    }
+
 }
-

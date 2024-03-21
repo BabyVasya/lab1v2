@@ -39,6 +39,12 @@ public class LSVS extends LN {
         this.outA = new MV();
         this.outB = new MV();
         this.outC = new MV();
+        this.outA.getQ().setValue("A");
+        this.outA.getT().setValue((int) (Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000));
+        this.outB.getQ().setValue("A");
+        this.outB.getT().setValue((int) (Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000));
+        this.outC.getQ().setValue("A");
+        this.outC.getT().setValue((int) (Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000));
     }
 
     @Override
@@ -65,16 +71,10 @@ public class LSVS extends LN {
     public void setMvToOut(){
         if(this.iterator.hasNext()) {
             String e =iterator.next();
-            this.outA.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
-            this.outA.getQ().setValue("KA");
             this.outA.getInstMag().getF().setValue(Double.valueOf(e.split(",")[1])*1000);
-            this.outB.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
-            this.outB.getQ().setValue("KA");
             this.outB.getInstMag().getF().setValue(Double.valueOf(e.split(",")[2])*1000);
-            this.outC.getT().setValue(Double.parseDouble(this.csvFileList.get(1).split(",")[0])*1000);
-            this.outC.getQ().setValue("KA");
             this.outC.getInstMag().getF().setValue(Double.valueOf(e.split(",")[3])*1000);
-            log.info(String.valueOf(outC));
+//            log.info(String.valueOf(outC));
         }
     }
     public void removeTrashInfo(){

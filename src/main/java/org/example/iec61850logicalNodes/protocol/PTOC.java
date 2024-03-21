@@ -2,56 +2,60 @@ package org.example.iec61850logicalNodes.protocol;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850datatypes.measurements.*;
 import org.example.iec61850logicalNodes.common.LN;
 
-
+//Узел пусковых органов тока
 @Data
 @Slf4j
 public class PTOC extends LN {
 
-    private ACT op = new ACT();
-    private ACD Str = new ACD();
-    private INC OpCntRs;
-    private CURVE TmACrv;
-    private CSG TmAChr33;
+    private ACT Op = new ACT(); //Срабатывание
+    private ACD Str = new ACD(); // Срабатываение направленной защиты (dir - directional)
+    private INC OpCntRs;  //Сбрасываемый счетчик операций
+    private CURVE TmACrv; //Настройки характеристик
+    private CSG TmAChr33; // Связано с curve, какие то графики рисует
     private CSD TmASt;
-    private ASG StrVal = new ASG();
-    private ASG TmMult;
-    private ING MinOpTmms;
-    private ING MaxOpTmms;
-    private ING OpDlTmms = new ING();
-    private ENG TypRsCrv;
-    private ING RsDlTmms;
-    private ENG DirMod;
-    private WYE A;
-    private double timeCounter = 0;
+    private ASG StrVal = new ASG();//Уставка по току
+    private ASG TmMult; //Множитель отсчета времени
+    private ING MinOpTmms; //Минимальное время работы
+    private ING MaxOpTmms; //Минимальное время работы
+    private ING OpDlTmms = new ING(); //Выдержка времени
+    private ENG TypRsCrv; //Тип сбрасываемой характеристики
+    private ING RsDlTmms; //Сброс выдержки времени
+    private ENG DirMod; //Направленный режим
+    private WYE A;//Входной отфильтрованный сигнал
+    private int timer; //Отсчет реле времени
+
+    public PTOC(double setMag, int stepSize, int setVal, WYE a) {
+        this.StrVal.getSetMag().getF().setValue(setMag);
+        this.OpDlTmms.getSetVal().setValue(setVal);
+        this.OpDlTmms.getStepSize().setValue(stepSize);
+        this.A = a;
+    }
 
     @Override
     public void process() {
-        op.getPhsA().setValue(A.getPhsA().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
-        op.getPhsB().setValue(A.getPhsB().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
-        op.getPhsC().setValue(A.getPhsC().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
-        op.getGeneral().setValue(op.getPhsA().getValue()||op.getPhsB().getValue()||op.getPhsC().getValue());
+        //Провервка уставки
+        Str.getPhsA().setValue(A.getPhsA().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
+        Str.getPhsB().setValue(A.getPhsB().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
+        Str.getPhsC().setValue(A.getPhsC().getCVal().getMag().getF().getValue() > this.StrVal.getSetMag().getF().getValue());
+        Str.getGeneral().setValue(Str.getPhsA().getValue()||Str.getPhsB().getValue()||Str.getPhsC().getValue());
 
-        if (op.getGeneral().getValue()) {
-            timeCounter += 1;
+
+        if (Str.getGeneral().getValue()) {
+            timer+=OpDlTmms.getStepSize().getValue();
+        }
+        else {
+            timer =0;
         }
 
-        Str.getGeneral().setValue(op.getGeneral().getValue());
-        Str.getPhsA().setValue(A.getPhsA().getCVal().getMag().getF().getValue() >
-                StrVal.getSetMag().getF().getValue());
-        Str.getPhsB().setValue(A.getPhsB().getCVal().getMag().getF().getValue() >
-                StrVal.getSetMag().getF().getValue());
-        Str.getPhsC().setValue(A.getPhsC().getCVal().getMag().getF().getValue() >
-                StrVal.getSetMag().getF().getValue());
-
-        // Внесение данных о наличии сиогнала на отключение во всех фазах при превышении выдержки
-        op.getGeneral().setValue(timeCounter > OpDlTmms.getSetVal().getValue());
-        op.getPhsA().setValue(timeCounter > OpDlTmms.getSetVal().getValue());
-        op.getPhsB().setValue(timeCounter > OpDlTmms.getSetVal().getValue());
-        op.getPhsC().setValue(timeCounter > OpDlTmms.getSetVal().getValue());
-
+        // Сигнал на отключение если выдержка времени прошла
+        Op.getGeneral().setValue(timer > OpDlTmms.getSetVal().getValue());
+        Op.getPhsA().setValue(timer > OpDlTmms.getSetVal().getValue());
+        Op.getPhsB().setValue(timer > OpDlTmms.getSetVal().getValue());
+        Op.getPhsC().setValue(timer > OpDlTmms.getSetVal().getValue());
     }
 
 

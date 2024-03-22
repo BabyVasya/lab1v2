@@ -1,0 +1,16 @@
+<PTOC>
+    <StrVal>
+     <setMag>
+         <f>
+           <value>412.0</value>
+         </f>
+     </setMag>
+    </StrVal>
+    <OpDlTmms>
+        <setVal>
+            <value>
+                200
+            </value>
+        </setVal>
+    </OpDlTmms>
+</PTOC>

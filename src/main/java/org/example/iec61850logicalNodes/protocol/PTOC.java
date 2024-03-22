@@ -6,9 +6,15 @@ import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850datatypes.measurements.*;
 import org.example.iec61850logicalNodes.common.LN;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 //Узел пусковых органов тока
 @Data
 @Slf4j
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "PTOC")
 public class PTOC extends LN {
 
     private ACT Op = new ACT(); //Срабатывание
@@ -33,6 +39,9 @@ public class PTOC extends LN {
         this.OpDlTmms.getSetVal().setValue(setVal);
         this.OpDlTmms.getStepSize().setValue(stepSize);
         this.A = a;
+    }
+    public PTOC(){
+
     }
 
     @Override

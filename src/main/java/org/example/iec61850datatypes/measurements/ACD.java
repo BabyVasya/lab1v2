@@ -1,26 +1,21 @@
 package org.example.iec61850datatypes.measurements;
 
 import lombok.Data;
-import org.example.iec61850datatypes.common.DataAttribute;
-
+import org.example.iec61850datatypes.common.Attribute;
+// Срабатывание направленной защиты
 @Data
 public class ACD extends ACT{
 
-    private DataAttribute<Direction> dirGeneral = new DataAttribute<>();
-    {
-        dirGeneral.setName("dirGeneral");
-        dirGeneral.setParent(this);
-        this.getChildren().add(dirGeneral);
-    }
+    private Attribute<Direction> dirGeneral = new Attribute<>();
 
 
-    private DataAttribute<Direction> dirPhsA = new DataAttribute<>();
+    private Attribute<Direction> dirPhsA = new Attribute<>();
 
 
-    private DataAttribute<Direction> dirPhsB = new DataAttribute<>();
+    private Attribute<Direction> dirPhsB = new Attribute<>();
 
 
-    private DataAttribute<Direction> dirPhsC = new DataAttribute<>();
+    private Attribute<Direction> dirPhsC = new Attribute<>();
 
     public enum Direction {
         FORWARD,

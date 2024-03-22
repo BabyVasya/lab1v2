@@ -1,6 +1,6 @@
 package org.example.iec61850logicalNodes.protocol;
 
-import org.example.iec61850datatypes.common.DataAttribute;
+import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850logicalNodes.common.LN;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class NHMI extends LN {
 
-    private final HashMap<XYSeries, DataAttribute<?>> datasets = new HashMap<>();
+    private final HashMap<XYSeries, Attribute<?>> datasets = new HashMap<>();
     private final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new NumberAxis("Время"));;
     private final JFrame frame = new JFrame();
 

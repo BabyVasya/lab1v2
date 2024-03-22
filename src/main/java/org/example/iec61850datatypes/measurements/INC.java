@@ -5,7 +5,7 @@ import org.example.iec61850datatypes.common.Originator;
 import org.example.iec61850datatypes.common.Quality;
 import org.example.iec61850datatypes.common.Timestamp;
 
-
+//Контроллируемый целочисленный статус (возможно, имеется ввиду сколько раз производились операции в классе узла)
 @lombok.Data
 public class INC extends Data {
     private Originator origin;

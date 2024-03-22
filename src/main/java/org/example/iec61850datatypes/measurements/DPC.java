@@ -1,23 +1,18 @@
 package org.example.iec61850datatypes.measurements;
 
 import org.example.iec61850datatypes.Data;
-import org.example.iec61850datatypes.common.DataAttribute;
+import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850datatypes.common.Originator;
 import org.example.iec61850datatypes.common.Quality;
 import org.example.iec61850datatypes.common.Timestamp;
 
 @lombok.Data
 public class DPC extends Data {
-    private DataAttribute<Position> stVal = new DataAttribute<>();
-    {
-        stVal.setName("stVal");
-        stVal.setParent(this);
-        this.getChildren().add(stVal);
-    }
+    private Attribute<Position> stVal = new Attribute<>();
 
-    private DataAttribute<Position> ctlVal = new DataAttribute<>();
+    private Attribute<Position> ctlVal = new Attribute<>();
 
-    private  DataAttribute<Integer> ctlNum = new DataAttribute<>();
+    private Attribute<Integer> ctlNum = new Attribute<>();
 
     private Originator origin = new Originator();
 

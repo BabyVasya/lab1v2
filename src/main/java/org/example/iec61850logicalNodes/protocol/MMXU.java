@@ -2,18 +2,16 @@ package org.example.iec61850logicalNodes.protocol;
 
 import lombok.Data;
 import org.example.filter.Filter;
-import org.example.filter.Fourier;
+import org.example.filter.FourierFilter;
 import org.example.iec61850datatypes.measurements.MV;
 import org.example.iec61850datatypes.measurements.WYE;
 import org.example.iec61850logicalNodes.common.LN;
 @Data
 public class MMXU extends LN {
+    //Отфильтрованные фазные токи, то есть выход узла
     private WYE A = new WYE();
-    private MV MinAPhs;
-    private MV MaxAPhs;
-
-    //мгновенные значения в фазах
-    public MV phsAInst;
+    //Мгновенные значения в фазах, то есть вход узла
+    public MV  phsAInst;
     public MV  phsBInst;
     public MV  phsCInst;
 
@@ -23,14 +21,15 @@ public class MMXU extends LN {
         this.phsCInst = phsCInst;
     }
 
-    //Создание экземпляров класса фильтра, для перобразования сигнала
-    private final Filter phsACurrent = new Fourier(20);
-    private final Filter phsBCurrent = new Fourier(20);
-    private final Filter phsCCurrent = new Fourier(20);
+    //Фильтры для передачи в процесс
+    private Filter phsAFiltration = new FourierFilter(20);
+    private Filter phsBFiltration = new FourierFilter(20);
+    private Filter phsCFiltration = new FourierFilter(20);
+
     @Override
     public void process() {
-        phsACurrent.process(phsAInst, A.getPhsA());
-        phsBCurrent.process(phsBInst, A.getPhsB());
-        phsCCurrent.process(phsCInst, A.getPhsC());
+        phsAFiltration.process(phsAInst, A.getPhsA());
+        phsBFiltration.process(phsBInst, A.getPhsB());
+        phsCFiltration.process(phsCInst, A.getPhsC());
     }
 }

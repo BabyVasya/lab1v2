@@ -1,15 +1,15 @@
 package org.example.iec61850datatypes.measurements;
 
 import org.example.iec61850datatypes.Data;
-import org.example.iec61850datatypes.common.DataAttribute;
+import org.example.iec61850datatypes.common.Attribute;
 
-//Описание каких-то кривых настройки используемых в защите
+//Описание каких-то кривых настройки используемых в защите(Может как в ДЗЛ от экра)
 @lombok.Data
 public class CURVE extends Data {
-    private DataAttribute<Float> setParA = new DataAttribute<>();
-    private DataAttribute<Float> setParB = new DataAttribute<>();
-    private DataAttribute<Float> setParC = new DataAttribute<>();
-    private DataAttribute<Float> setParD = new DataAttribute<>();
-    private DataAttribute<Float> setParE = new DataAttribute<>();
-    private DataAttribute<Float> setParF = new DataAttribute<>();
+    private Attribute<Float> setParA = new Attribute<>();
+    private Attribute<Float> setParB = new Attribute<>();
+    private Attribute<Float> setParC = new Attribute<>();
+    private Attribute<Float> setParD = new Attribute<>();
+    private Attribute<Float> setParE = new Attribute<>();
+    private Attribute<Float> setParF = new Attribute<>();
 }

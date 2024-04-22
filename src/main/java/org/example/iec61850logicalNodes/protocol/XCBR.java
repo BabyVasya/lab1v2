@@ -4,8 +4,15 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.example.iec61850datatypes.measurements.*;
 import org.example.iec61850logicalNodes.common.LN;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 @Data
 @Slf4j
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "CSWI")
 public class XCBR extends LN {
     private DPL EEName;
     private ENS EEHealth;
@@ -29,10 +36,6 @@ public class XCBR extends LN {
             Pos.getStVal().setValue(DPC.Position.OFF);
             OpCnt.getStVal().setValue(OpCnt.getStVal().getValue() +1);
         }
-//        else if(Pos.getStVal().getValue().equals(DPC.Position.OFF)) {
-//            Pos.getStVal().setValue(DPC.Position.ON);
-//            OpCnt.getStVal().setValue(OpCnt.getStVal().getValue() +1);
-//        }
         log.info("Положение выключателя " + Pos.getStVal());
     }
 }

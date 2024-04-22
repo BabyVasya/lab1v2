@@ -1,4 +1,4 @@
-package org.example.iec61850logicalNodes.protocol;
+package org.example.iec61850logicalNodes.protocol.graphics;
 
 import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850logicalNodes.common.LN;
@@ -15,13 +15,17 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "NHMI")
 public class NHMI extends LN {
 
     private final HashMap<XYSeries, Attribute<?>> datasets = new HashMap<>();

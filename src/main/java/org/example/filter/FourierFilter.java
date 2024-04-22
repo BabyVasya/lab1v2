@@ -5,8 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.iec61850datatypes.measurements.CMV;
 import org.example.iec61850datatypes.measurements.MV;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 @Data
 @Slf4j
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "FourierFilter")
 public class FourierFilter extends Filter{
     private int bufferSize;
     private MV[] buffer;
@@ -15,6 +22,9 @@ public class FourierFilter extends Filter{
     public double Iy;
     public double freq;
     public double T;
+
+    public FourierFilter() {
+    }
 
     public FourierFilter(int bufferSize){
         this.bufferSize = bufferSize;
@@ -47,6 +57,6 @@ public class FourierFilter extends Filter{
         Ii = Ii + 1;
         if (Ii >= bufferSize) Ii =0;
 
-        log.info(String.valueOf(output));
+//        log.info(String.valueOf(output));
     }
 }

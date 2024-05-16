@@ -32,7 +32,7 @@ public class XCBR extends LN {
     private ING CBTmms = new ING();
     @Override
     public void process() {
-        if (Pos.getStVal().getValue().equals(DPC.Position.OFF)){
+        if (Pos.getStVal().getValue().equals(DPC.Position.OFF)) {
             Pos.getStVal().setValue(DPC.Position.OFF);
             OpCnt.getStVal().setValue(OpCnt.getStVal().getValue() +1);
         }

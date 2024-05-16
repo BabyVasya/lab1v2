@@ -1,7 +1,7 @@
 package org.example;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.Xml.ReadXmlCfg;
+import org.example.iec61850logicalNodes.protocol.*;
 import org.example.iec61850logicalNodes.protocol.graphics.NHMI;
 import org.example.iec61850logicalNodes.protocol.graphics.NHMISignal;
 
@@ -9,59 +9,122 @@ import org.example.iec61850logicalNodes.protocol.graphics.NHMISignal;
 public class Main {
 
     public static void main(String[] args) {
-        NodesFactory nodesFactory = ReadXmlCfg.readConfig();
+        LSVS lsvs = new LSVS();
+        MMXU mmxuCurrent = new MMXU(lsvs.getOutACurrent(), lsvs.getOutBCurrent(), lsvs.getOutCCurrent());
+        MMXU mmxuVoltage = new MMXU(lsvs.getOutAVoltage(), lsvs.getOutBVoltage(), lsvs.getOutCVoltage());
+        MSQI msqi = new MSQI(mmxuCurrent.getA(), mmxuVoltage.getA());
+        RDIR rdir = new RDIR(msqi.getSeqA(), msqi.getSeqV());
+
+        PTOC ptocDir1 = new PTOC(msqi.getSeqA());
+        ptocDir1.getStrVal().getSetMag().getF().setValue(650d);
+        ptocDir1.getOpDlTmms().getSetVal().setValue(500d);
+        ptocDir1.getOpDlTmms().getStepSize().setValue((double) lsvs.getOutACurrent().getT().getValue());
+        ptocDir1.getOpCntRs().getTOpOk().setValue(100);
+
+        PTOC ptocDir2 = new PTOC(msqi.getSeqA());
+        ptocDir2.getStrVal().getSetMag().getF().setValue(650d);
+        ptocDir2.getOpDlTmms().getSetVal().setValue(700d);
+        ptocDir2.getOpDlTmms().getStepSize().setValue((double) lsvs.getOutACurrent().getT().getValue());
+        ptocDir2.getOpCntRs().getTOpOk().setValue(100);
+
+        PTOC ptocUnDir1 = new PTOC(msqi.getSeqA());
+        ptocUnDir1.getStrVal().getSetMag().getF().setValue(650d);
+        ptocUnDir1.getOpDlTmms().getSetVal().setValue(900d);
+        ptocUnDir1.getOpDlTmms().getStepSize().setValue((double) lsvs.getOutACurrent().getT().getValue());
+        ptocUnDir1.getOpCntRs().getTOpOk().setValue(100);
+
+        PTOC ptocUnDir2 = new PTOC(msqi.getSeqA());
+        ptocUnDir2.getStrVal().getSetMag().getF().setValue(650d);
+        ptocUnDir2.getOpDlTmms().getSetVal().setValue(1100d);
+        ptocUnDir2.getOpDlTmms().getStepSize().setValue((double) lsvs.getOutACurrent().getT().getValue());
+        ptocUnDir2.getOpCntRs().getTOpOk().setValue(100);
+
+        PTOC ptocUnDir3 = new PTOC(msqi.getSeqA());
+        ptocUnDir3.getStrVal().getSetMag().getF().setValue(650d);
+        ptocUnDir3.getOpDlTmms().getSetVal().setValue(1300d);
+        ptocUnDir3.getOpDlTmms().getStepSize().setValue((double) lsvs.getOutACurrent().getT().getValue());
+        ptocUnDir3.getOpCntRs().getTOpOk().setValue(100);
+
+        CSWI cswi = new CSWI(ptocDir1.getStr(),
+                ptocDir2.getStr(),
+                ptocUnDir1.getOp(),
+                ptocUnDir2.getOp(),
+                ptocUnDir3.getOp());
+        XCBR xcbr = new XCBR();
+        xcbr.getOpCnt().getStVal().setValue(0);
 
 
-        NHMI nhmiCurrents = new NHMI();
-        nhmiCurrents.addSignals(new NHMISignal("Фаза А", nodesFactory.getLsvs().getOutA().getInstMag().getF()));
-        nhmiCurrents.addSignals(new NHMISignal("Фаза B", nodesFactory.getLsvs().getOutB().getInstMag().getF()));
-        nhmiCurrents.addSignals(new NHMISignal("Фаза C", nodesFactory.getLsvs().getOutC().getInstMag().getF()));
-        nhmiCurrents.addSignals(new NHMISignal("Фаза А действ и уставка", nodesFactory.getMmxu().getA().getPhsA().getCVal().getMag().getF()),
-                                                                              new NHMISignal("",nodesFactory.getPtoc().get(0).getStrVal().getSetMag().getF()));
-        nhmiCurrents.addSignals(new NHMISignal("Фаза B действ и уставка", nodesFactory.getMmxu().getA().getPhsB().getCVal().getMag().getF()),
-                                                                              new NHMISignal("",nodesFactory.getPtoc().get(0).getStrVal().getSetMag().getF()));
-        nhmiCurrents.addSignals(new NHMISignal("Фаза C действ и уставка", nodesFactory.getMmxu().getA().getPhsC().getCVal().getMag().getF()),
-                                                                              new NHMISignal("",nodesFactory.getPtoc().get(0).getStrVal().getSetMag().getF()));
-        NHMI nhmiRelay1 = new NHMI();
-        NHMI nhmiRelay2 = new NHMI();
-        NHMI nhmiRelay3 = new NHMI();
-        nhmiRelay1.addSignals(new NHMISignal("Срабатывание фазы А - 1", nodesFactory.getPtoc().get(0).getStr().getPhsA()),
-                new NHMISignal("A", nodesFactory.getPtoc().get(0).getOp().getPhsA()));
-        nhmiRelay1.addSignals(new NHMISignal("Срабатывание фазы B - 1", nodesFactory.getPtoc().get(0).getStr().getPhsB()),
-                new NHMISignal("B", nodesFactory.getPtoc().get(0).getOp().getPhsB()));
-        nhmiRelay1.addSignals(new NHMISignal("Срабатывание фазы C - 1", nodesFactory.getPtoc().get(0).getStr().getPhsC()),
-                new NHMISignal("C", nodesFactory.getPtoc().get(0).getOp().getPhsC()));
-        nhmiRelay1.addSignals(new NHMISignal("Срабатывание защиты - 1", nodesFactory.getPtoc().get(0).getStr().getGeneral()),
-                new NHMISignal("G", nodesFactory.getPtoc().get(0).getOp().getGeneral()));
-        nhmiRelay2.addSignals(new NHMISignal("Срабатывание фазы А - 2", nodesFactory.getPtoc().get(1).getStr().getPhsA()),
-                new NHMISignal("A", nodesFactory.getPtoc().get(1).getOp().getPhsA()));
-        nhmiRelay2.addSignals(new NHMISignal("Срабатывание фазы B - 2", nodesFactory.getPtoc().get(1).getStr().getPhsB()),
-                new NHMISignal("B", nodesFactory.getPtoc().get(1).getOp().getPhsB()));
-        nhmiRelay2.addSignals(new NHMISignal("Срабатывание фазы C - 2", nodesFactory.getPtoc().get(1).getStr().getPhsC()),
-                new NHMISignal("C", nodesFactory.getPtoc().get(1).getOp().getPhsC()));
-        nhmiRelay2.addSignals(new NHMISignal("Срабатывание защиты - 2", nodesFactory.getPtoc().get(1).getStr().getGeneral()),
-                new NHMISignal("G", nodesFactory.getPtoc().get(1).getOp().getGeneral()));
-        nhmiRelay3.addSignals(new NHMISignal("Срабатывание фазы А - 3", nodesFactory.getPtoc().get(2).getStr().getPhsA()),
-                new NHMISignal("A", nodesFactory.getPtoc().get(2).getOp().getPhsA()));
-        nhmiRelay3.addSignals(new NHMISignal("Срабатывание фазы B - 3", nodesFactory.getPtoc().get(2).getStr().getPhsB()),
-                new NHMISignal("B", nodesFactory.getPtoc().get(2).getOp().getPhsB()));
-        nhmiRelay3.addSignals(new NHMISignal("Срабатывание фазы C - 3", nodesFactory.getPtoc().get(2).getStr().getPhsC()),
-                new NHMISignal("C", nodesFactory.getPtoc().get(2).getOp().getPhsC()));
-        nhmiRelay3.addSignals(new NHMISignal("Срабатывание защиты - 3", nodesFactory.getPtoc().get(2).getStr().getGeneral()),
-                new NHMISignal("G", nodesFactory.getPtoc().get(2).getOp().getGeneral()));
 
-        while (nodesFactory.getLsvs().hasNext()) {
-            nodesFactory.getLsvs().process();
-            nodesFactory.getMmxu().process();
-            nodesFactory.getPtoc().get(0).process();
-            nodesFactory.getPtoc().get(1).process();
-            nodesFactory.getPtoc().get(2).process();
-            nhmiCurrents.process();
-            nhmiRelay1.process();
-            nhmiRelay2.process();
-            nhmiRelay3.process();
-            nodesFactory.getCswi().process();
-            nodesFactory.getXcbr().process();
+        NHMI nhmiValues = new NHMI();
+        NHMI nhmiFourierValues = new NHMI();
+        NHMI nhmiSeqValues = new NHMI();
+        nhmiValues.addSignals(new NHMISignal("Ток Фаза А", lsvs.getOutACurrent().getInstMag().getF()));
+        nhmiValues.addSignals(new NHMISignal("Ток Фаза B", lsvs.getOutBCurrent().getInstMag().getF()));
+        nhmiValues.addSignals(new NHMISignal("Ток Фаза C", lsvs.getOutCCurrent().getInstMag().getF()));
+        nhmiValues.addSignals(new NHMISignal("Напр Фаза А", lsvs.getOutAVoltage().getInstMag().getF()));
+        nhmiValues.addSignals(new NHMISignal("Напр Фаза B", lsvs.getOutBVoltage().getInstMag().getF()));
+        nhmiValues.addSignals(new NHMISignal("Напр Фаза C", lsvs.getOutCVoltage().getInstMag().getF()));
+
+        nhmiFourierValues.addSignals(new NHMISignal("Ток Фаза А действ и уставка", mmxuCurrent.getA().getPhsA().getCVal().getMag().getF())
+               ,new NHMISignal("Фаза тока А", mmxuCurrent.getA().getPhsA().getCVal().getAng().getF()));
+        nhmiFourierValues.addSignals(new NHMISignal("Ток Фаза B действ и уставка", mmxuCurrent.getA().getPhsB().getCVal().getMag().getF()),
+                new NHMISignal("Фаза тока B", mmxuCurrent.getA().getPhsB().getCVal().getAng().getF()));
+        nhmiFourierValues.addSignals(new NHMISignal("Ток Фаза C действ и уставка", mmxuCurrent.getA().getPhsC().getCVal().getMag().getF()),
+                new NHMISignal("Фаза тока C", mmxuCurrent.getA().getPhsC().getCVal().getAng().getF()));
+
+        nhmiFourierValues.addSignals(new NHMISignal("Напр Фаза А действ и уставка", mmxuVoltage.getA().getPhsA().getCVal().getMag().getF()));
+        nhmiFourierValues.addSignals(new NHMISignal("Напр Фаза B действ и уставка", mmxuVoltage.getA().getPhsB().getCVal().getMag().getF()));
+        nhmiFourierValues.addSignals(new NHMISignal("Напр Фаза C действ и уставка", mmxuVoltage.getA().getPhsC().getCVal().getMag().getF()));
+
+        nhmiSeqValues.addSignals(new NHMISignal("ПП тока", msqi.getSeqA().getC1().getCVal().getMag().getF()));
+        nhmiSeqValues.addSignals(new NHMISignal("ОП тока", msqi.getSeqA().getC2().getCVal().getMag().getF()));
+        nhmiSeqValues.addSignals(new NHMISignal("НП тока", msqi.getSeqA().getC3().getCVal().getMag().getF()),
+                new NHMISignal("Уставка", ptocDir1.getStrVal().getSetMag().getF()));
+        nhmiSeqValues.addSignals(new NHMISignal("ПП Напряжения", msqi.getSeqV().getC1().getCVal().getMag().getF()));
+        nhmiSeqValues.addSignals(new NHMISignal("ОП Напряжения", msqi.getSeqV().getC2().getCVal().getMag().getF()));
+        nhmiSeqValues.addSignals(new NHMISignal("НП Напряжения", msqi.getSeqV().getC3().getCVal().getMag().getF()));
+
+        NHMI nhmiSrab = new NHMI();
+        nhmiSrab.addSignals(new NHMISignal("Срабатывание 1 напр ступ", ptocDir1.getPusk().getGeneral()),
+             new NHMISignal("Пуск 1 напр ступ", ptocDir1.getStr().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Срабатывание 2 напр ступ", ptocDir2.getPusk().getGeneral()),
+                new NHMISignal("Пуск 2 напр ступ", ptocDir2.getStr().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Срабатывание 1 ненапр ступ", ptocUnDir1.getPusk().getGeneral()),
+                new NHMISignal("Пуск 1 ненапр ступ", ptocUnDir1.getOp().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Срабатывание 2 ненапр ступ", ptocUnDir2.getPusk().getGeneral()),
+                new NHMISignal("Пуск 2 ненапр ступ", ptocUnDir2.getOp().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Срабатывание 3 ненапр ступ", ptocUnDir3.getPusk().getGeneral()),
+                new NHMISignal("Пуск 3 ненапр ступ", ptocUnDir3.getOp().getGeneral()));
+
+        nhmiSrab.addSignals(new NHMISignal("Сигнал в АУВ от 1 напр ступ", cswi.getOpOpnDir1().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Сигнал в АУВ от 2 напр ступ", cswi.getOpOpnDir2().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Сигнал в АУВ от 1 ненапр ступ", cswi.getOpOpnUnDir1().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Сигнал в АУВ от 2 ненапр ступ", cswi.getOpOpnUnDir2().getGeneral()));
+        nhmiSrab.addSignals(new NHMISignal("Сигнал в АУВ от 3 ненапр ступ", cswi.getOpOpnUnDir3().getGeneral()));
+
+
+        while (lsvs.getIteratorDat().hasNext()) {
+            lsvs.process();
+            mmxuCurrent.process();
+            mmxuVoltage.process();
+            msqi.process();
+            rdir.process();
+            ptocDir1.process();
+            ptocDir1.getDirMod().getSetVal().setValue(rdir.getDir().getDirGeneral().getValue());
+            ptocDir2.process();
+            ptocDir2.getDirMod().getSetVal().setValue(rdir.getDir().getDirGeneral().getValue());
+            ptocUnDir1.process();
+            ptocUnDir2.process();
+            ptocUnDir3.process();
+            cswi.process();
+            xcbr.getPos().getStVal().setValue(cswi.getPos().getStVal().getValue());
+            xcbr.process();
+
+            nhmiValues.process();
+            nhmiFourierValues.process();
+            nhmiSeqValues.process();
+            nhmiSrab.process();
+
         }
     }
 }

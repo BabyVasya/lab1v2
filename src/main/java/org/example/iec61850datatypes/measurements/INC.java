@@ -16,5 +16,5 @@ public class INC extends Data {
     private boolean stSeld;
     private boolean opRcvd;
     private boolean opOk;
-    private Timestamp tOpOk;
+    private Timestamp tOpOk = new Timestamp();
 }

@@ -32,9 +32,9 @@ public class MMXU extends LN {
 
 
     //Фильтры для передачи в процесс
-    private FourierFilter phsAFiltration = new FourierFilter(20);
-    private FourierFilter phsBFiltration = new FourierFilter(20);
-    private FourierFilter phsCFiltration = new FourierFilter(20);
+    private FourierFilter phsAFiltration = new FourierFilter(80);
+    private FourierFilter phsBFiltration = new FourierFilter(80);
+    private FourierFilter phsCFiltration = new FourierFilter(80);
 
     @Override
     public void process() {

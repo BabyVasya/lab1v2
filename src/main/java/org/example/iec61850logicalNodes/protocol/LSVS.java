@@ -44,7 +44,7 @@ public class LSVS extends LN {
     //Инициализация листа аналоговых сигналов типа MV(Величина, тип величины, время)
     public LSVS() {
         setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/Опыты/");
-        setFilePath(path,"KZ1");
+        setFilePath(path,"KZ2");
     }
 
     @Override

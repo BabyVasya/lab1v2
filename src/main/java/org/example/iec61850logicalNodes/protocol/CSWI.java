@@ -19,6 +19,7 @@ public class CSWI extends LN {
     //OpOpn будет на каждую ступень
     private ACT OpOpnDir1; //Отключение от напр ступени 1
     private ACT OpOpnDir2; //Отключение от напр ступени 2
+    private ACT OpOpnDir3; //Отключение от напр ступени 3
     private ACT OpOpnUnDir1; //Отключение от ненапр ступени 1
     private ACT OpOpnUnDir2; //Отключение от ненапр ступени 2
     private ACT OpOpnUnDir3; //Отключение от ненапр ступени 3
@@ -33,9 +34,10 @@ public class CSWI extends LN {
     private DPC PosB = new DPC(); //Отправка УВ L2
     private DPC PosC = new DPC(); //Отправка УВ L3
 
-    public CSWI(ACT opOpnDir1, ACT opOpnDir2, ACT opOpnUnDir1, ACT opOpnUnDir2, ACT opOpnUnDir3) {
+    public CSWI(ACT opOpnDir1, ACT opOpnDir2, ACT opOpnDir3, ACT opOpnUnDir1, ACT opOpnUnDir2, ACT opOpnUnDir3) {
         OpOpnDir1 = opOpnDir1;
         OpOpnDir2 = opOpnDir2;
+        OpOpnDir3 = opOpnDir3;
         OpOpnUnDir1 = opOpnUnDir1;
         OpOpnUnDir2 = opOpnUnDir2;
         OpOpnUnDir3 = opOpnUnDir3;
@@ -59,7 +61,7 @@ public class CSWI extends LN {
             PosB.getStVal().setValue(DPC.Position.ON);
             PosC.getStVal().setValue(DPC.Position.ON);
         }
-        log.info("Сигнал на отключение  " + Pos.getStVal());
+//        log.info("Сигнал на отключение  " + Pos.getStVal());
     }
 
 }

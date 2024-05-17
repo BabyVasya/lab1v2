@@ -20,17 +20,32 @@ public class RDIR extends LN {
     private ASG minPPV = new ASG();
     private SEQ seqA;
     private SEQ seqV;
-    private WYE resistance;
+    private WYE Z;
     public Attribute<Double> power = new Attribute<>();
 
-    public RDIR(SEQ seqA, SEQ seqV) {
-        this.seqA = seqA;
-        this.seqV = seqV;
+    public RDIR() {
+
     }
 
     @Override
     public void process() {
+        if (checkOrientation(Z.getPhsA()) && checkOrientation(Z.getPhsB()) && checkOrientation(Z.getPhsC())){
+            dir.getDirGeneral().setValue(ACD.Direction.FORWARD);
+        } else {
+            dir.getDirGeneral().setValue(ACD.Direction.BACKWARD);
+        }
 
+//        log.info(String.valueOf(dir.getDirGeneral().getValue()) );
+
+    }
+
+    private boolean checkOrientation(CMV phase){
+        return phase.getCVal().getIm().getF().getValue() >=
+                (phase.getCVal().getRe().getF().getValue() *
+                        Math.tan((chrAng.getSetMag().getF().getValue() + 100) * Math.PI / 180)) &&
+                phase.getCVal().getIm().getF().getValue() >=
+                        (phase.getCVal().getRe().getF().getValue() *
+                                Math.tan((chrAng.getSetMag().getF().getValue() - 100) * Math.PI / 180));
     }
 
 }

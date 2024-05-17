@@ -68,6 +68,37 @@ public class MMXU extends LN {
         Z.getPhsC().getCVal().getMag().getF().setValue(
                 PPV.getPhsAC().getCVal().getMag().getF().getValue()/PPA.getPhsAC().getCVal().getMag().getF().getValue()
         );
+
+
+        Z.getPhsA().getCVal().getAng().getF().setValue(
+                PPV.getPhsAB().getCVal().getAng().getF().getValue() - PPA.getPhsAB().getCVal().getAng().getF().getValue()
+        );
+        Z.getPhsB().getCVal().getAng().getF().setValue(
+                PPV.getPhsBC().getCVal().getAng().getF().getValue() - PPA.getPhsBC().getCVal().getAng().getF().getValue()
+        );
+        Z.getPhsC().getCVal().getAng().getF().setValue(
+                PPV.getPhsAC().getCVal().getAng().getF().getValue() - PPA.getPhsAC().getCVal().getAng().getF().getValue()
+        );
+
+
+        Z.getPhsA().getCVal().getRe().getF().setValue(
+                Z.getPhsA().getCVal().getMag().getF().getValue()*Math.cos(Z.getPhsA().getCVal().getAng().getF().getValue())
+        );
+        Z.getPhsA().getCVal().getIm().getF().setValue(
+                Z.getPhsA().getCVal().getMag().getF().getValue()*Math.sin(Z.getPhsA().getCVal().getAng().getF().getValue())
+        );
+        Z.getPhsB().getCVal().getRe().getF().setValue(
+                Z.getPhsB().getCVal().getMag().getF().getValue()*Math.cos(Z.getPhsB().getCVal().getAng().getF().getValue())
+        );
+        Z.getPhsB().getCVal().getIm().getF().setValue(
+                Z.getPhsB().getCVal().getMag().getF().getValue()*Math.sin(Z.getPhsB().getCVal().getAng().getF().getValue())
+        );
+        Z.getPhsC().getCVal().getRe().getF().setValue(
+                Z.getPhsC().getCVal().getMag().getF().getValue()*Math.cos(Z.getPhsC().getCVal().getAng().getF().getValue())
+        );
+        Z.getPhsC().getCVal().getIm().getF().setValue(
+                Z.getPhsC().getCVal().getMag().getF().getValue()*Math.sin(Z.getPhsC().getCVal().getAng().getF().getValue())
+        );
     }
 
     private void convertToPhToPhOrto() {

@@ -30,12 +30,16 @@ public class XCBR extends LN {
     private SPC BlkCls = new SPC();
     private SPC ChatMotEna;
     private ING CBTmms = new ING();
+    private int c;
     @Override
     public void process() {
+        if (c == 0) {
+            OpCnt.getStVal().setValue(0);
+            c++;
+        }
         if (Pos.getStVal().getValue().equals(DPC.Position.OFF)) {
-            Pos.getStVal().setValue(DPC.Position.OFF);
             OpCnt.getStVal().setValue(OpCnt.getStVal().getValue() +1);
         }
-        log.info("Положение выключателя " + Pos.getStVal());
+//        log.info("Положение выключателя " + Pos.getStVal());
     }
 }

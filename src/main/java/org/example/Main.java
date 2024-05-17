@@ -214,7 +214,7 @@ public class Main {
 
             cswi.process();
             xcbr.getPos().getStVal().setValue(cswi.getPos().getStVal().getValue());
-            xcbr.process();
+//            xcbr.process();
 
             nhmiValues.process();
             nhmiDistance.process();

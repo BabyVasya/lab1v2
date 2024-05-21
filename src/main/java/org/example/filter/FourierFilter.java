@@ -16,47 +16,39 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "FourierFilter")
 public class FourierFilter extends Filter{
     private int bufferSize;
-    private MV[] buffer;
-    public int  Ii;
-    public double Ix;
-    public double Iy;
-    public double freq;
+    private double[] buffer = new double[9999];
+    private final double[] bufferX = new double[9999];
+    private final double[] bufferY = new double[9999];
+    public int  i;
+    public double x;
+    public double y;
+    public double frequency;
     public double T;
+    private double k;
 
 
     public FourierFilter(int bufferSize){
         this.bufferSize = bufferSize;
-        this.buffer = new MV[bufferSize];
-        this.Ii = 0;
-        this.Ix = 0;
-        this.Iy = 0;
-        this.freq = 50;
-        this.T = (0.02 / bufferSize);
-
-        for (int i = 0; i < bufferSize; i++) {
-            MV Iphs = new MV();
-            Iphs.getInstMag().getF().setValue(0.0);
-            buffer[i] = Iphs;
-        }
+        this.k  =(double) 2/this.bufferSize;
+        this.frequency  = 50;
     }
 
-    @Override
+
     public void process(MV input, CMV output) {
+        double value = input.getInstMag().getF().getValue();
 
-        Ix = Ix + (input.getInstMag().getF().getValue() - buffer[Ii].getInstMag().getF().getValue()) *
-                Math.sin(2 * Math.PI * freq * Ii * T) * 2 / bufferSize;
+        x += k * value * Math.sin((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i) - bufferX[i];
+        y += k * value * Math.cos((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i) - bufferY[i];
 
-        Iy = Iy + (input.getInstMag().getF().getValue() - buffer[Ii].getInstMag().getF().getValue()) *
-                Math.cos(2 * Math.PI * freq * Ii * T) * 2 / bufferSize;
+        bufferX[i] = (k * value * Math.sin((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i));
+        bufferY[i] = (k * value * Math.cos((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i));
 
-        output.getCVal().getMag().getF().setValue(Math.sqrt(Math.pow(Ix, 2) + Math.pow(Iy, 2))/Math.sqrt(2));
-        output.getCVal().getAng().getF().setValue(Math.atan(Iy / Ix));
-        output.getT().setValue(input.getT().getValue());
+       log.info(String.valueOf(bufferSize));
+       output.getCVal().getMag().getF().setValue(Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))/Math.sqrt(2));
+       output.getCVal().getAng().getF().setValue(Math.atan(y / x));
+       output.getT().setValue(input.getT().getValue());
 
-        buffer[Ii].getInstMag().getF().setValue(input.getInstMag().getF().getValue());
-        Ii = Ii + 1;
-        if (Ii >= bufferSize) Ii =0;
-
-//        log.info(String.valueOf(output));
+        i = i + 1;
+        if (i >= this.bufferSize ) i =0;
     }
 }

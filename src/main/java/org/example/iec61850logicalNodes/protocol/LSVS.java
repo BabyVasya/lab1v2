@@ -24,27 +24,30 @@ public class LSVS extends LN {
 
     private File cfgFile;
     private File datFile;
-    @XmlElement
     private String path;
+    private int connectionNumber;
     private List<String> cfgDataFile = new ArrayList<>();
     private List<String> datDataFile = new ArrayList<>();
     private MV outACurrent = new MV();
     private MV outBCurrent = new MV();
     private MV outCCurrent = new MV();
-    private MV outAVoltage = new MV();
-    private MV outBVoltage = new MV();
-    private MV outCVoltage = new MV();
     private List<String> datFileList = new ArrayList<>();
     private List<Double> aCoef = new ArrayList<>();
     private List<Double> bCoef = new ArrayList<>();
-    @XmlTransient
     private Iterator<String> iteratorDat;
     private Iterator<String> iteratorOut;
+    private int discFreq;
 
     //Инициализация листа аналоговых сигналов типа MV(Величина, тип величины, время)
-    public LSVS() {
-        setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/Опыты/");
-        setFilePath(path,"KZ1");
+    public LSVS(int connectionNumber) {
+        if(connectionNumber == 1) this.connectionNumber = 2;
+        if(connectionNumber == 2) this.connectionNumber = 5;
+        if(connectionNumber == 3) this.connectionNumber = 8;
+        if(connectionNumber == 4) this.connectionNumber = 11;
+        if(connectionNumber == 5) this.connectionNumber = 14;
+        setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/DPB/5 sections/");
+//        setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/Опыты/");
+        setFilePath(path,"Vkl");
     }
 
     @Override
@@ -57,26 +60,9 @@ public class LSVS extends LN {
     public void setMvToOut(){
         if(this.iteratorDat.hasNext()) {
             String e =iteratorDat.next();
-            this.outAVoltage.getInstMag().getF().setValue((Double.valueOf(e.split(",")[2])*aCoef.get(0)+bCoef.get(0))*1000);
-            this.outBVoltage.getInstMag().getF().setValue((Double.valueOf(e.split(",")[3])*aCoef.get(1)+bCoef.get(1))*1000);
-            this.outCVoltage.getInstMag().getF().setValue((Double.valueOf(e.split(",")[4])*aCoef.get(2)+bCoef.get(2))*1000);
-            this.outACurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[5])*aCoef.get(3)+bCoef.get(3))*1000);
-            this.outBCurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[6])*aCoef.get(4)+bCoef.get(4))*1000);
-            this.outCCurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[7])*aCoef.get(5)+bCoef.get(5))*1000);
-
-            this.outACurrent.getQ().setValue("A");
-            this.outBCurrent.getQ().setValue("A");
-            this.outCCurrent.getQ().setValue("A");
-            this.outAVoltage.getQ().setValue("V");
-            this.outBVoltage.getQ().setValue("V");
-            this.outCVoltage.getQ().setValue("V");
-            this.outACurrent.getT().setValue(250);
-            this.outBCurrent.getT().setValue(250);
-            this.outCCurrent.getT().setValue(250);
-            this.outAVoltage.getT().setValue(250);
-            this.outBVoltage.getT().setValue(250);
-            this.outCVoltage.getT().setValue(250);
-
+            this.outACurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[this.connectionNumber])*aCoef.get(this.connectionNumber-2)+bCoef.get(this.connectionNumber-2))*1000);
+            this.outBCurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[this.connectionNumber+1])*aCoef.get(this.connectionNumber-1)+bCoef.get(this.connectionNumber-1))*1000);
+            this.outCCurrent.getInstMag().getF().setValue((Double.valueOf(e.split(",")[this.connectionNumber+2])*aCoef.get(this.connectionNumber-0)+bCoef.get(this.connectionNumber-0))*1000);
         }
     }
     //метод чтения файлов
@@ -91,14 +77,12 @@ public class LSVS extends LN {
         extractCfgFileData();
     }
 
-    public boolean hasNext() {
-        return iteratorDat.hasNext();
-    }
     //сбор коэффициентов для рассчета токов из .dat файла
     private void extractCfgFileData() {
         int analogNumber = Integer.parseInt(cfgDataFile.get(1).split(",")[1].replace("A", ""));
         int discreteNumber = Integer.parseInt(cfgDataFile.get(1).split(",")[2].replace("D", ""));
-
+        this.discFreq = Integer.parseInt(cfgDataFile.get(20).split(",")[1]);
+//        this.discFreq = Integer.parseInt(cfgDataFile.get(10).split(",")[1]);
         for (int i = 2; i < 2 + analogNumber; i++) {
             aCoef.add(Double.parseDouble(cfgDataFile.get(i).split(",")[5]));
             bCoef.add(Double.parseDouble(cfgDataFile.get(i).split(",")[6]));

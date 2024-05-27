@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Slf4j
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "FourierFilter")
-public class FourierFilter extends Filter{
+public class FourierFilter {
     private int bufferSize;
     private double[] buffer = new double[9999];
     private final double[] bufferX = new double[9999];
@@ -22,33 +22,54 @@ public class FourierFilter extends Filter{
     public int  i;
     public double x;
     public double y;
-    public double frequency;
     public double T;
     private double k;
+    private double discFreq;
+    private double prevValue;
+    private int harmNum;
 
 
-    public FourierFilter(int bufferSize){
-        this.bufferSize = bufferSize;
+    public FourierFilter(int discFreq, int harmNum){
+        this.discFreq = discFreq;
+        this.bufferSize = (int) (this.discFreq/40);
         this.k  =(double) 2/this.bufferSize;
-        this.frequency  = 50;
+        this.harmNum = harmNum;
+
     }
 
 
-    public void process(MV input, CMV output) {
-        double value = input.getInstMag().getF().getValue();
+    public void process(MV input, CMV output , double frequency) {
 
-        x += k * value * Math.sin((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i) - bufferX[i];
-        y += k * value * Math.cos((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i) - bufferY[i];
+       if (frequency == 0 || Double.isNaN(frequency)) frequency = 50*harmNum;
+       else frequency = frequency*harmNum;
+       double bufferSizeDouble = this.discFreq / (frequency/harmNum);
+        this.bufferSize = (int) ( this.discFreq/(frequency/harmNum));
 
-        bufferX[i] = (k * value * Math.sin((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i));
-        bufferY[i] = (k * value * Math.cos((2 * Math.PI * frequency) * ((1/frequency)/bufferSize) * i));
+       double fractionalPart = bufferSizeDouble - bufferSize ;
+       double value = input.getInstMag().getF().getValue() + (input.getInstMag().getF().getValue() - this.prevValue)*fractionalPart;
+       this.k  =(double) 2/bufferSizeDouble;
 
-       log.info(String.valueOf(bufferSize));
+
+       x += k * value * Math.sin((2 * Math.PI * frequency) * ((1/(frequency/harmNum))/bufferSize) * (i+fractionalPart)) - bufferX[i];
+       y += k * value * Math.cos((2 * Math.PI * frequency) * ((1/(frequency/harmNum))/bufferSize) * (i+fractionalPart)) - bufferY[i];
+
+       bufferX[i] = (k * value * Math.sin((2 * Math.PI * frequency) * ((1/(frequency/harmNum))/bufferSize) * (i+fractionalPart)));
+       bufferY[i] = (k * value * Math.cos((2 * Math.PI * frequency) * ((1/(frequency/harmNum))/bufferSize) * (i+fractionalPart)));
        output.getCVal().getMag().getF().setValue(Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))/Math.sqrt(2));
-       output.getCVal().getAng().getF().setValue(Math.atan(y / x));
+       output.getCVal().getAng().getF().setValue(Math.atan2(y , x));
        output.getT().setValue(input.getT().getValue());
+       output.getCVal().getRe().getF().setValue(x);
+       output.getCVal().getIm().getF().setValue(y);
 
-        i = i + 1;
-        if (i >= this.bufferSize ) i =0;
+
+//        log.info("Размер буфера " + this.bufferSize + " x " + x + " y " + y + " bad " + (1/(frequency/harmNum)) + " k " + k);
+       i = i + 1;
+       if (i >= this.bufferSize ) i =0;
+       this.prevValue = value;
+       i = i + 1;
+       if (i >= this.bufferSize ) i =0;
+       this.prevValue = value;
+
+
     }
 }

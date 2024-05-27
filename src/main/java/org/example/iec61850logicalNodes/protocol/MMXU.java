@@ -28,9 +28,9 @@ public class MMXU extends LN {
         this.phsBInstC = phsBInstC;
         this.phsCInstC = phsCInstC;
         this.discFreq = discFreq;
-        this.phsAFiltrationC = new FourierFilter(this.discFreq/50);
-        this.phsBFiltrationC = new FourierFilter(this.discFreq/50);
-        this.phsCFiltrationC = new FourierFilter(this.discFreq/50);
+        this.phsAFiltrationC = new FourierFilter(this.discFreq, 1);
+        this.phsBFiltrationC = new FourierFilter(this.discFreq, 1);
+        this.phsCFiltrationC = new FourierFilter(this.discFreq, 1);
     }
 
 
@@ -40,9 +40,9 @@ public class MMXU extends LN {
 
     @Override
     public void process() {
-        phsAFiltrationC.process(phsAInstC, A.getPhsA());
-        phsBFiltrationC.process(phsBInstC, A.getPhsB());
-        phsCFiltrationC.process(phsCInstC, A.getPhsC());
+        phsAFiltrationC.process(phsAInstC, A.getPhsA(), 50);
+        phsBFiltrationC.process(phsBInstC, A.getPhsB(), 50);
+        phsCFiltrationC.process(phsCInstC, A.getPhsC(), 50);
 
         A.getPhsA().getCVal().getRe().getF().setValue(A.getPhsA().getCVal().getMag().getF().getValue()*Math.cos(A.getPhsA().getCVal().getAng().getF().getValue()));
         A.getPhsA().getCVal().getIm().getF().setValue(A.getPhsA().getCVal().getMag().getF().getValue()*Math.sin(A.getPhsA().getCVal().getAng().getF().getValue()));
@@ -52,8 +52,6 @@ public class MMXU extends LN {
 
         A.getPhsC().getCVal().getRe().getF().setValue(A.getPhsC().getCVal().getMag().getF().getValue()*Math.cos(A.getPhsC().getCVal().getAng().getF().getValue()));
         A.getPhsC().getCVal().getIm().getF().setValue(A.getPhsC().getCVal().getMag().getF().getValue()*Math.sin(A.getPhsC().getCVal().getAng().getF().getValue()));
-
-
     }
 
 

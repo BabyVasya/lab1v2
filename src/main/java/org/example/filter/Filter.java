@@ -7,5 +7,5 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
 @XmlTransient
 public abstract class Filter {
-    public abstract void process(MV inputValue, CMV  outputValue);
+    public abstract void process(MV inputValue, CMV  outputValue, double frequency);
 }

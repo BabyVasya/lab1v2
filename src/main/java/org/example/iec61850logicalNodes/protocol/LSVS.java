@@ -47,7 +47,7 @@ public class LSVS extends LN {
         if(connectionNumber == 5) this.connectionNumber = 14;
         setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/DPB/5 sections/");
 //        setPath("C:/Users/artem/Desktop/2 сем/AlgRZA/lab1/Опыты/");
-        setFilePath(path,"Vkl");
+        setFilePath(path,"KzB");
     }
 
     @Override

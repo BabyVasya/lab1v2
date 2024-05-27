@@ -4,11 +4,8 @@ package org.example;
 import lombok.extern.slf4j.Slf4j;
 import org.example.iec61850logicalNodes.protocol.*;
 import org.example.iec61850logicalNodes.protocol.graphics.NHMI;
-import org.example.iec61850logicalNodes.protocol.graphics.NHMIPoint;
 import org.example.iec61850logicalNodes.protocol.graphics.NHMISignal;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Slf4j
@@ -58,12 +55,6 @@ public class Main {
         rmxu.setALoc4(mmxu4.getA());
         rmxu.setALoc5(mmxu5.getA());
 
-        PDIF pdif = new PDIF();
-        pdif.getTmACrv().getSetParA().setValue(2800f);
-        pdif.getTmACrv().getSetParB().setValue(3000f);
-        pdif.getTmACrv().getSetParC().setValue(0.3f);
-        pdif.setDifAClc(rmxu.getDif());
-        pdif.setRstA(rmxu.getRst());
 
         MHAI mhai1 = new MHAI(
                 lsvs1.getOutACurrent(),
@@ -96,6 +87,8 @@ public class Main {
                 discFreq
         );
 
+
+
         PHAR phar1 = new PHAR();
         PHAR phar2 = new PHAR();
         PHAR phar3 = new PHAR();
@@ -107,8 +100,34 @@ public class Main {
         phar4.setHA(mhai4.getHA());
         phar5.setHA(mhai5.getHA());
 
+        PDIF pdif = new PDIF();
+        pdif.getTmACrv().getSetParA().setValue(2800f);
+        pdif.getTmACrv().getSetParB().setValue(3000f);
+        pdif.getTmACrv().getSetParC().setValue(0.3f);
+        pdif.setDifAClc(rmxu.getDif());
+        pdif.setRstA(rmxu.getRst());
+        pdif.setBlc5Harm1(phar1.getStr());
+        pdif.setBlc5Harm2(phar2.getStr());
+        pdif.setBlc5Harm3(phar3.getStr());
+        pdif.setBlc5Harm4(phar4.getStr());
+        pdif.setBlc5Harm5(phar5.getStr());
+
         PTOC ptoc = new PTOC(rmxu.getDif());
-        ptoc.getStrVal().getSetMag().getF().setValue(2900d);
+        ptoc.getStrVal().getSetMag().getF().setValue(12000d);
+
+        CSWI cswi1 = new CSWI(ptoc.getOp(), pdif.getOp());
+        CSWI cswi2 = new CSWI(ptoc.getOp(), pdif.getOp());
+        CSWI cswi3 = new CSWI(ptoc.getOp(), pdif.getOp());
+        CSWI cswi4 = new CSWI(ptoc.getOp(), pdif.getOp());
+        CSWI cswi5 = new CSWI(ptoc.getOp(), pdif.getOp());
+
+        XCBR xcbr1 = new XCBR(cswi1.getPos());
+        XCBR xcbr2 = new XCBR(cswi2.getPos());
+        XCBR xcbr3 = new XCBR(cswi3.getPos());
+        XCBR xcbr4 = new XCBR(cswi4.getPos());
+        XCBR xcbr5 = new XCBR(cswi5.getPos());
+
+
 
 
 
@@ -122,10 +141,6 @@ public class Main {
         NHMI nhmiFourierValues45 = new NHMI();
         NHMI nhmipidf = new NHMI();
         NHMI harmonics1 = new NHMI();
-        NHMI harmonics2 = new NHMI();
-        NHMI harmonics3= new NHMI();
-        NHMI harmonics4 = new NHMI();
-        NHMI harmonics5 = new NHMI();
         nhmiValues13.addSignals(new NHMISignal("Ток Фаза А 1", lsvs1.getOutACurrent().getInstMag().getF()));
         nhmiValues13.addSignals(new NHMISignal("Ток Фаза B 1", lsvs1.getOutBCurrent().getInstMag().getF()));
         nhmiValues13.addSignals(new NHMISignal("Ток Фаза C 1", lsvs1.getOutCCurrent().getInstMag().getF()));
@@ -190,6 +205,17 @@ public class Main {
             phar5.process();
             rmxu.process();
             pdif.process();
+            ptoc.process();
+            cswi1.process();
+            cswi2.process();
+            cswi3.process();
+            cswi4.process();
+            cswi5.process();
+            xcbr1.process();
+            xcbr2.process();
+            xcbr3.process();
+            xcbr4.process();
+            xcbr5.process();
 
             nhmiValues13.process();
             nhmiValues45.process();
@@ -199,22 +225,5 @@ public class Main {
             nhmipidf.process();
         }
     }
-    private static List<NHMIPoint<Double, Double>> makeCharacteristic(double x0, double y0){
-        List<NHMIPoint<Double, Double>> pointsList = new ArrayList<>();
-        double y = 0;
-        for(double x= 0; x<= x0; x += 0.1) {
-            y+=1;
-            pointsList.add(new NHMIPoint<>(x, y));
-            pointsList.add(new NHMIPoint<>(x, -y));
-        }
-        return pointsList;
-    }
-    private static List<NHMIPoint<Double, Double>> makeCharDirection(double r, double fi){
-        List<NHMIPoint<Double, Double>> pointsList = new ArrayList<>();
-        for(double x = -r; x<= r; x += 0.1) {
-            double y = x * Math.tan(fi);
-            pointsList.add(new NHMIPoint<>(x, y));
-        }
-        return pointsList;
-    }
+
 }

@@ -31,6 +31,11 @@ public class XCBR extends LN {
     private SPC ChatMotEna;
     private ING CBTmms = new ING();
     private int c;
+
+    public XCBR(DPC pos) {
+        Pos = pos;
+    }
+
     @Override
     public void process() {
         if (c == 0) {

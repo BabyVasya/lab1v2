@@ -34,23 +34,16 @@ public class CSWI extends LN {
     private DPC PosB = new DPC(); //Отправка УВ L2
     private DPC PosC = new DPC(); //Отправка УВ L3
 
-    public CSWI(ACT opOpnDir1, ACT opOpnDir2, ACT opOpnDir3, ACT opOpnUnDir1, ACT opOpnUnDir2, ACT opOpnUnDir3) {
+    public CSWI(ACT opOpnDir1, ACT opOpnDir2) {
         OpOpnDir1 = opOpnDir1;
         OpOpnDir2 = opOpnDir2;
-        OpOpnDir3 = opOpnDir3;
-        OpOpnUnDir1 = opOpnUnDir1;
-        OpOpnUnDir2 = opOpnUnDir2;
-        OpOpnUnDir3 = opOpnUnDir3;
     }
 
     @Override
     public void process() {
         //Проверка наличия сигнала на отключение выключателя от каждой из защит
         if (OpOpnDir1.getGeneral().getValue()
-                || OpOpnDir2.getGeneral().getValue()
-                || OpOpnUnDir1.getGeneral().getValue()
-                || OpOpnUnDir2.getGeneral().getValue()
-                || OpOpnUnDir3.getGeneral().getValue()) {
+                || OpOpnDir2.getGeneral().getValue()) {
             Pos.getStVal().setValue(DPC.Position.OFF);
             PosA.getStVal().setValue(DPC.Position.OFF);
             PosB.getStVal().setValue(DPC.Position.OFF);

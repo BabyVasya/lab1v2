@@ -2,18 +2,15 @@ package org.example.iec61850logicalNodes.protocol;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.example.iec61850datatypes.common.Attribute;
 import org.example.iec61850datatypes.measurements.*;
 import org.example.iec61850logicalNodes.common.LN;
-
-import java.awt.*;
 
 @Data
 @Slf4j
 public class PDIF extends LN {
-    public ACD Str = new ACD();
-    public ACT Op = new ACT();
-    public CSD TmASt = new CSD();
+    private ACD Str = new ACD();
+    private ACT Op = new ACT();
+    private CSD TmASt = new CSD();
     private WYE DifAClc = new WYE();
     private WYE RstA = new WYE();
     private INC OpCntRs = new INC();
@@ -21,21 +18,21 @@ public class PDIF extends LN {
     private ASG LoSet = new ASG();
     private ASG HiSet = new ASG();
     private ING MinOpTmms = new ING();
-    public ING MaxOpTmms = new ING();
-    public ING OpDlTmms = new ING();
+    private ING MaxOpTmms = new ING();
+    private ING OpDlTmms = new ING();
     private ENG RstMod = new ENG();
     private ING RsDlTmms = new ING();
     private CURVE TmACrv = new CURVE();
     private CSG TmChr33 = new CSG();
+    private WYE Res = new WYE();
+    private WYE Dif = new WYE();
+    private ACD Blc5Harm1 = new ACD();
+    private ACD Blc5Harm2 = new ACD();
+    private ACD Blc5Harm3 = new ACD();
+    private ACD Blc5Harm4 = new ACD();
+    private ACD Blc5Harm5 = new ACD();
 
-    public WYE ALoc = new WYE();
-    public WYE Res = new WYE();
-    public WYE Dif = new WYE();
-    public ACT Blc = new ACT();
-    private double timeCounter = 0;
-    private double CntA = 0;
-    private double CntB = 0;
-    private double CntC = 0;
+
     public PDIF() {
         this.Str.getGeneral().setValue(false);
         this.Str.getPhsA().setValue(false);
